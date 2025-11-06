@@ -1,7 +1,7 @@
-Code up lên đang chỉ là bản ensemble learning vì bản autoML train cần thời gian và khá nặng, kết quả đẩy lên là thu được từ việc train những ngày chẵn(4-6-8-...-60) để tối ưu thời gian nhưng vẫn đảm bảo hiệu suất chấp nhậ được.
+Code up lên đang chỉ là bản ensemble learning vì bản autoML train cần thời gian và khá nặng, kết quả đẩy lên là thu được từ việc train những ngày chẵn(4-6-8-...-60) để tối ưu thời gian nhưng vẫn đảm bảo hiệu suất chấp nhận được.
 
 Pipe line của Ensemble model:
-1. Lấy các feature input và tạo các feature mới đặt trưng, đồng thời fit PolynomialFeature và lưu lại, drop "cứng" các cột "yếu"(đã check)
+1. Lấy các feature input và tạo các feature mới đặc trưng, đồng thời fit PolynomialFeature và lưu lại, drop "cứng" các cột "yếu"(đã check)
 
 2. Thực hiện biến đổi Yeo Johnson trên tập train và áp dụng lên tập test, đồng thời lưu lại để sử dụng về sau.
 
