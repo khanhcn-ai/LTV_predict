@@ -1,0 +1,88 @@
+
+Giá trị NAE cho d4 : 2.6334%
+Thời gian dự đoán (trên 50 data mẫu): 1.5673 giây
+-----------------------------------------
+Giá trị NAE cho d6 : 4.5698%
+Thời gian dự đoán (trên 50 data mẫu): 0.1163 giây
+-----------------------------------------
+Giá trị NAE cho d8 : 4.7837%
+Thời gian dự đoán (trên 50 data mẫu): 0.1078 giây
+-----------------------------------------
+Giá trị NAE cho d10 : 5.4232%
+Thời gian dự đoán (trên 50 data mẫu): 0.1283 giây
+-----------------------------------------
+Giá trị NAE cho d12 : 5.6956%
+Thời gian dự đoán (trên 50 data mẫu): 0.1133 giây
+-----------------------------------------
+Giá trị NAE cho d14 : 5.4632%
+Thời gian dự đoán (trên 50 data mẫu): 0.1122 giây
+-----------------------------------------
+Giá trị NAE cho d16 : 6.2621%
+Thời gian dự đoán (trên 50 data mẫu): 0.1293 giây
+-----------------------------------------
+Giá trị NAE cho d18 : 6.1127%
+Thời gian dự đoán (trên 50 data mẫu): 0.1181 giây
+-----------------------------------------
+Giá trị NAE cho d20 : 7.1478%
+Thời gian dự đoán (trên 50 data mẫu): 0.1124 giây
+-----------------------------------------
+Giá trị NAE cho d22 : 5.9024%
+Thời gian dự đoán (trên 50 data mẫu): 0.1240 giây
+-----------------------------------------
+Giá trị NAE cho d24 : 7.0067%
+Thời gian dự đoán (trên 50 data mẫu): 0.1207 giây
+-----------------------------------------
+Giá trị NAE cho d26 : 7.1745%
+Thời gian dự đoán (trên 50 data mẫu): 0.1348 giây
+-----------------------------------------
+Giá trị NAE cho d28 : 7.3857%
+Thời gian dự đoán (trên 50 data mẫu): 0.1368 giây
+-----------------------------------------
+Giá trị NAE cho d30 : 8.6287%
+Thời gian dự đoán (trên 50 data mẫu): 0.1293 giây
+-----------------------------------------
+Giá trị NAE cho d32 : 7.9195%
+Thời gian dự đoán (trên 50 data mẫu): 0.1166 giây
+-----------------------------------------
+Giá trị NAE cho d34 : 6.9164%
+Thời gian dự đoán (trên 50 data mẫu): 0.1340 giây
+-----------------------------------------
+Giá trị NAE cho d36 : 8.0709%
+Thời gian dự đoán (trên 50 data mẫu): 0.1194 giây
+-----------------------------------------
+Giá trị NAE cho d38 : 7.8282%
+Thời gian dự đoán (trên 50 data mẫu): 0.1400 giây
+-----------------------------------------
+Giá trị NAE cho d40 : 8.1656%
+Thời gian dự đoán (trên 50 data mẫu): 0.1400 giây
+-----------------------------------------
+Giá trị NAE cho d42 : 8.1388%
+Thời gian dự đoán (trên 50 data mẫu): 0.1443 giây
+-----------------------------------------
+Giá trị NAE cho d44 : 7.3492%
+Thời gian dự đoán (trên 50 data mẫu): 0.1398 giây
+-----------------------------------------
+Giá trị NAE cho d46 : 9.0516%
+Thời gian dự đoán (trên 50 data mẫu): 0.1243 giây
+-----------------------------------------
+Giá trị NAE cho d48 : 8.0984%
+Thời gian dự đoán (trên 50 data mẫu): 0.1091 giây
+-----------------------------------------
+Giá trị NAE cho d50 : 7.0467%
+Thời gian dự đoán (trên 50 data mẫu): 0.1357 giây
+-----------------------------------------
+Giá trị NAE cho d52 : 8.2168%
+Thời gian dự đoán (trên 50 data mẫu): 0.1139 giây
+-----------------------------------------
+Giá trị NAE cho d54 : 8.8476%
+Thời gian dự đoán (trên 50 data mẫu): 0.1171 giây
+-----------------------------------------
+Giá trị NAE cho d56 : 7.6791%
+Thời gian dự đoán (trên 50 data mẫu): 0.1326 giây
+-----------------------------------------
+Giá trị NAE cho d58 : 8.7317%
+Thời gian dự đoán (trên 50 data mẫu): 0.1059 giây
+-----------------------------------------
+Giá trị NAE cho d60 : 7.8833%
+Thời gian dự đoán (trên 50 data mẫu): 0.1079 giây
+-----------------------------------------
