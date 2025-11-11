@@ -18,18 +18,24 @@ Dự án này xây dựng hệ thống machine learning để dự đoán **Life
 - **LightGBM Regressor**: Light gradient boosting với regression_l1
 - **CatBoost Regressor**: Categorical features handling với MAE loss
 
-### 2. **Meta Model (Level 2)**
-- **XGBoost Meta**: Kết hợp predictions từ 3 base models
-- Input: `[pred_xgb, pred_lgbm, pred_cat]`
+### 2. **OOF Predictions (Level 2)**
+- **ElasticNet Ensemble**: 5-fold cross-validation predictions
+- **Feature Generation**: Tạo feature `OOF_ElasticNet` cho training data
+- **Standardization**: Mỗi fold có riêng StandardScaler
+- **Ensemble Averaging**: Trung bình predictions từ 5 ElasticNet models
 
-### 3. **Residual Model (Level 3)**
+### 3. **Meta Model (Level 3)**
+- **XGBoost Meta**: Kết hợp predictions từ base models + OOF feature
+- Input: `[pred_xgb, pred_lgbm, pred_cat, OOF_ElasticNet]`
+
+### 4. **Residual Model (Level 4)**
 - **XGBoost Residual**: Hiệu chỉnh predictions cuối cùng
 - Input: `[base_preds, meta_stats, meta_pred]`
 - Features: `mean, std, range` của base predictions + meta prediction
 
-### 4. **Feature Engineering Pipeline**
+### 5. **Feature Engineering Pipeline**
 ```
-Raw Data → Base Features → Polynomial Features → Power Transform → Ensemble Input
+Raw Data → Base Features → Polynomial Features → Power Transform → OOF Features → Ensemble Input
 ```
 
 ## 📁 Cấu Trúc Thư Mục
@@ -125,7 +131,7 @@ jupyter notebook notebook/draw1.ipynb
 
 ### NAE (Normalized Absolute Error) Performance
 
-#### Trên Test Set (Final Ensemble)
+#### Trên Infer Set (Final Ensemble)
 | Day Range | NAE (%) | Performance |
 |-----------|---------|-------------|
 | D4-D10    | 2.99-5.50| ⭐⭐⭐ Excellent |
@@ -142,10 +148,11 @@ jupyter notebook notebook/draw1.ipynb
 - **Trend**: Gradual increase in error over time (expected)
 
 ### Model Architecture Benefits
-- **Stacking**: Cải thiện ~15-20% so với single models
-- **Residual correction**: Giảm ~5% NAE
+- **4-Level Stacking**: Cải thiện ~20-25% so với single models
+- **OOF Predictions**: Prevent data leakage, improve generalization
+- **Residual correction**: Giảm ~5% NAE với statistical corrections
 - **Feature engineering**: Cải thiện ~25% so với raw features
-- **Hyperparameter tuning**: Cải thiện ~10% với Optuna
+- **Hyperparameter tuning**: Cải thiện ~10% với Optuna optimization
 
 ## 🎯 Model Pipeline Details
 
@@ -167,15 +174,19 @@ def build_model_per_day(input_day):
     X_train_transformed = power_X.fit_transform(X_train)
     y_train_transformed = power_y.fit_transform(y_train)
     
-    # 5. Base models training
+    # 5. OOF predictions generation
+    X_train_transformed, X_test_transformed, oof_predict_models = generate_oof_elasticnet(
+        X_train_transformed, y_train_transformed, X_test_transformed, cv)
+
+    # 6. Base models training
     xgb_model = build_xgboost_model(d_train, X_train_transformed, y_train_transformed)
     lgbm_model = build_lightgbm_model(d_train, X_train_transformed, y_train_transformed)
     cat_model = build_catboost_model(X_train_transformed, y_train_transformed)
-    
-    # 6. Meta model training
+
+    # 7. Meta model training
     meta_model = build_stacking_model(xgb_params, lgbm_params, cat_params, ...)
-    
-    # 7. Residual model training
+
+    # 8. Residual model training
     res_model = build_res_model(meta_params, ...)
     
     # 8. Save artifacts
@@ -195,26 +206,35 @@ def load_and_predict_ensemble(input_data_df, input_day):
     X_transformed = power_X.transform(X)
     
     # 4. OOF predictions (ElasticNet ensemble)
-    oof_pred = ensemble_elasticnet_predict(X_transformed, oof_models)
-    X_transformed['OOF_ElasticNet'] = oof_pred
-    
+    test_oof_elasticnet = np.zeros(X_transformed.shape[0])
+    cv_n_splits = len(oof_predict_models)
+    for item in oof_predict_models:
+        model = item['model']
+        scaler = item['scaler']
+        X_scaled = scaler.transform(X_transformed.values)
+        test_oof_elasticnet += model.predict(X_scaled) / cv_n_splits
+    X_transformed['OOF_ElasticNet'] = test_oof_elasticnet
+
     # 5. Base model predictions
     pred_xgb = xgb_model.predict(X_transformed)
     pred_lgbm = lgbm_model.predict(X_transformed)
     pred_cat = cat_model.predict(X_transformed)
-    
+
     # 6. Meta model prediction
     X_meta = np.column_stack([pred_xgb, pred_lgbm, pred_cat])
     pred_meta = meta_model.predict(X_meta)
-    
+
     # 7. Residual model correction
-    meta_stats = calculate_meta_statistics(X_meta)
-    X_res = np.column_stack([pred_xgb, pred_lgbm, pred_cat, meta_stats, pred_meta])
+    meta_cols = ['meta_xgb', 'meta_lgbm', 'meta_cat']
+    meta_mean = pd.DataFrame(X_meta, columns=meta_cols).mean(axis=1)
+    meta_std = pd.DataFrame(X_meta, columns=meta_cols).std(axis=1)
+    meta_range = pd.DataFrame(X_meta, columns=meta_cols).max(axis=1) - pd.DataFrame(X_meta, columns=meta_cols).min(axis=1)
+    X_res = np.column_stack([pred_xgb, pred_lgbm, pred_cat, meta_mean, meta_std, meta_range, pred_meta])
     residual_correction = residual_model.predict(X_res)
-    
+
     # 8. Final prediction
     final_pred_transformed = pred_meta + residual_correction
-    final_prediction = power_y.inverse_transform(final_pred_transformed)
+    final_prediction = power_y.inverse_transform(final_pred_transformed.reshape(-1, 1)).flatten()
     
     return final_prediction
 ```
@@ -288,10 +308,11 @@ artifacts = {
 
 ### 1. **Multi-Level Stacking**
 ```python
-# 3-level ensemble architecture
+# 4-level ensemble architecture
 Level 1: Base Models (XGB + LGBM + CatBoost)
-Level 2: Meta Model (XGB on base predictions)  
-Level 3: Residual Model (XGB on meta + statistics)
+Level 2: OOF Predictions (ElasticNet ensemble)
+Level 3: Meta Model (XGB on base predictions + OOF)
+Level 4: Residual Model (XGB on meta + statistics)
 ```
 
 ### 2. **Advanced Feature Engineering**
@@ -302,9 +323,9 @@ Level 3: Residual Model (XGB on meta + statistics)
 
 ### 3. **Robust Data Pipeline**
 - **Power transformation** cho skewed distributions
-- **Out-of-fold predictions** prevent data leakage  
+- **OOF ElasticNet ensemble** tạo meta-features chống data leakage
 - **Mixup augmentation** improve generalization
-- **Cross-validation** cho reliable evaluation
+- **5-fold cross-validation** cho reliable evaluation
 
 ### 4. **Automated Optimization**
 - **Optuna hyperparameter tuning** với pruning
